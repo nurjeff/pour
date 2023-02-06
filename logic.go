@@ -177,12 +177,12 @@ func Setup(isDocker bool) {
 		Log(false, ColorPurple, "LogServer values invalid, falling back to local")
 	}
 
-	Log(false, ColorPurple, "Log-Server configured at", config.Host+":"+fmt.Sprint(config.Port))
+	LogColor(false, ColorPurple, "Log-Server configured at", config.Host+":"+fmt.Sprint(config.Port))
 
 	runTime = time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")
 	runTime = strings.ReplaceAll(runTime, ":", "_")
 
-	Log(false, ColorGreen, "Pour up and running..")
+	LogColor(false, ColorGreen, "Pour up and running..")
 	go logLoop(config.Host, uint(config.Port), config.ProjectKey, config.RemoteLogs, config.Client, config.ClientKey)
 }
 
