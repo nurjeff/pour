@@ -11,6 +11,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 type logModel struct {
@@ -183,7 +186,41 @@ func Setup(isDocker bool) {
 	runTime = strings.ReplaceAll(runTime, ":", "_")
 
 	LogColor(false, ColorGreen, "Pour up and running..")
+	go pollUsage()
 	go logLoop(config.Host, uint(config.Port), config.ProjectKey, config.RemoteLogs, config.Client, config.ClientKey)
+}
+
+func pollUsage() {
+	for {
+		hw := HardwareUsage{}
+
+		v, err := mem.VirtualMemory()
+		if err == nil {
+			hw.MemoryFree = v.Free
+			hw.MemoryTotal = v.Total
+			hw.MemoryUsed = v.Used
+		}
+
+		cpus, _ := cpu.Percent(time.Second*5, true)
+		hw.CPUs = cpus
+		stats, err := cpu.Info()
+		if err == nil {
+			if len(stats) >= 1 {
+				hw.CPUInfo = stats[0]
+			}
+		}
+
+		log.Println("HARDWARE:", hw)
+		time.Sleep(time.Second * 30)
+	}
+}
+
+type HardwareUsage struct {
+	MemoryTotal uint64       `json:"memory_total"`
+	MemoryUsed  uint64       `json:"memory_used"`
+	MemoryFree  uint64       `json:"memory_free"`
+	CPUs        []float64    `json:"cpus"`
+	CPUInfo     cpu.InfoStat `json:"cpu_info"`
 }
 
 func logLoop(host string, port uint, key string, doRemote bool, client string, clientKey string) {
@@ -191,7 +228,6 @@ func logLoop(host string, port uint, key string, doRemote bool, client string, c
 		time.Sleep(time.Second * 5)
 		if doRemote && len(cache.items) > 0 {
 			remoteLog(cache.items, host, port, key, client, clientKey)
-
 		}
 	}
 }
