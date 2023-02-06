@@ -147,8 +147,8 @@ func Setup(isDocker bool) {
 		}
 	}
 
-	if !exists(logPath + "/config_pour.json") {
-		file, err := os.Create(logPath + "/config_pour.json")
+	if !exists("./config_pour.json") {
+		file, err := os.Create("./config_pour.json")
 		if err != nil {
 			Log(false, ColorRed, "Error auto-creating pour config:", err)
 			return
@@ -159,11 +159,11 @@ func Setup(isDocker bool) {
 			return
 		}
 
-		LogPanicKill(-1, "Pour-Config ("+logPath+"/config_pour.json) was created, please fill out and restart the server")
+		LogPanicKill(-1, "Pour-Config ("+"./config_pour.json) was created, please fill out and restart the server")
 		return
 	}
 
-	contents, err := os.ReadFile(logPath + "/config_pour.json")
+	contents, err := os.ReadFile("./config_pour.json")
 	if err != nil {
 		LogPanicKill(-1, "Couldn't read pour config")
 		return
