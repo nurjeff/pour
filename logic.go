@@ -210,8 +210,37 @@ func pollUsage() {
 			}
 		}
 
-		log.Println("HARDWARE:", hw)
+		go sendHardwareUsage(hw)
 		time.Sleep(time.Second * 30)
+	}
+}
+
+func sendHardwareUsage(hw HardwareUsage) {
+	b, err := json.Marshal(&hw)
+	if err != nil {
+		Log(false, ColorRed, "Error marshalling hardware-info", err)
+	}
+	httpPrefix := "http://"
+	if useTLS {
+		httpPrefix = "https://"
+	}
+	req, err := http.NewRequest("PATCH", httpPrefix+config.Host+":"+fmt.Sprint(config.Port)+"/logs/projects/hardware", strings.NewReader(string(b)))
+	if err != nil {
+		//Handle Error
+		Log(false, ColorRed, "Error creating hardware-info request", err)
+	}
+
+	req.Header.Add("X-CLIENT", config.Client)
+	req.Header.Add("Authorization", config.ClientKey)
+	req.Header.Add("X-KEY", config.ProjectKey)
+
+	res, err := client.Do(req)
+	if err != nil {
+		Log(false, ColorRed, "Error transmitting hardware-info", err)
+	}
+
+	if res.StatusCode != http.StatusAccepted {
+		Log(false, ColorRed, "Error transmitting hardware-info", res)
 	}
 }
 
