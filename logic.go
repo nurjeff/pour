@@ -127,7 +127,7 @@ func localLog(msg string, time string) {
 	}
 }
 
-const defaultFileContent = "{\n\t\"remote_logs\": true, \n\t\"project_key\": \"<GET THIS FROM SERVER ADMINISTRATOR>\", \n\t\"host\": \"127.0.0.1\", \n\t\"port\": 12555, \n\t\"client\": \"loguser2\", \n\t\"client_key\": \"b930ffce-d388-43fc-aa1a-13962a7d6bc9\" \n}"
+const defaultFileContent = "{\n\t\"remote_logs\": true, \n\t\"project_key\": \"<GET THIS FROM SERVER ADMINISTRATOR>\", \n\t\"host\": \"127.0.0.1\", \n\t\"port\": 12555, \n\t\"client\": \"default_user\", \n\t\"client_key\": \"c8e0e509-ba4b-4c90-bbf2-8336627ac3ed\" \n}"
 
 type PourConfig struct {
 	RemoteLogs bool   `json:"remote_logs"`
