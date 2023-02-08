@@ -33,6 +33,12 @@ var runTime string
 var logPath = "."
 var useTLS = true
 
+var errorHardwareAmount = 0
+var errorLogAmount = 0
+
+const MAX_HARDWARE_ERRORS = 2
+const MAX_LOG_ERRORS = 2
+
 func SetUseTLS(use bool) {
 	useTLS = use
 }
@@ -217,16 +223,19 @@ func pollUsage() {
 
 func sendHardwareUsage(hw HardwareUsage) {
 	b, err := json.Marshal(&hw)
-	if err != nil {
+	if err != nil && errorHardwareAmount < MAX_HARDWARE_ERRORS {
+		errorHardwareAmount++
 		Log(false, ColorRed, "Error marshalling hardware-info", err)
+		return
 	}
 	httpPrefix := "http://"
 	if useTLS {
 		httpPrefix = "https://"
 	}
 	req, err := http.NewRequest("PATCH", httpPrefix+config.Host+":"+fmt.Sprint(config.Port)+"/logs/projects/hardware", strings.NewReader(string(b)))
-	if err != nil {
+	if err != nil && errorHardwareAmount < MAX_HARDWARE_ERRORS {
 		//Handle Error
+		errorHardwareAmount++
 		Log(false, ColorRed, "Error creating hardware-info request", err)
 		return
 	}
@@ -236,13 +245,16 @@ func sendHardwareUsage(hw HardwareUsage) {
 	req.Header.Add("X-KEY", config.ProjectKey)
 
 	res, err := client.Do(req)
-	if err != nil {
+	if err != nil && errorHardwareAmount < MAX_HARDWARE_ERRORS {
 		Log(false, ColorRed, "Error transmitting hardware-info", err)
+		errorHardwareAmount++
 		return
 	}
 
-	if res.StatusCode != http.StatusAccepted {
+	if res.StatusCode != http.StatusAccepted && errorHardwareAmount < MAX_HARDWARE_ERRORS {
+		errorHardwareAmount++
 		Log(false, ColorRed, "Error transmitting hardware-info", res)
+		return
 	}
 }
 
@@ -271,7 +283,8 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	cache.RWMutex.Lock()
 	defer cache.RWMutex.Unlock()
 	b, err := json.Marshal(&logs)
-	if err != nil {
+	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
+		errorLogAmount++
 		Log(false, ColorRed, "Error marshalling logs", err)
 		return err
 	}
@@ -280,8 +293,9 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 		httpPrefix = "https://"
 	}
 	req, err := http.NewRequest("POST", httpPrefix+host+":"+fmt.Sprint(port)+"/logs", strings.NewReader(string(b)))
-	if err != nil {
+	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
 		//Handle Error
+		errorLogAmount++
 		Log(false, ColorRed, "Error marshalling logs", err)
 		return err
 	}
@@ -291,21 +305,23 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	req.Header.Add("X-KEY", key)
 
 	res, err := client.Do(req)
-	if err != nil {
+	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
 		Log(false, ColorRed, "Error transmitting logs", err)
 		return err
 	}
 	if res.StatusCode == http.StatusAccepted {
 		cache.items = []logModel{}
 	} else {
-		defer res.Body.Close()
-		read, err := io.ReadAll(res.Body)
-		if err == nil {
-			Log(false, ColorRed, "Error logging", string(read))
-		} else {
-			Log(false, ColorRed, "Error logging", res.StatusCode)
+		if errorLogAmount < MAX_LOG_ERRORS {
+			errorLogAmount++
+			defer res.Body.Close()
+			read, err := io.ReadAll(res.Body)
+			if err == nil {
+				Log(false, ColorRed, "Error logging", string(read))
+			} else {
+				Log(false, ColorRed, "Error logging", res.StatusCode)
+			}
 		}
-
 	}
 	return nil
 }
