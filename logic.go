@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -44,9 +45,13 @@ func SetUseTLS(use bool) {
 }
 
 func Log(args ...interface{}) {
-	go func(args ...interface{}) {
+	_, filename, line, ok := runtime.Caller(1)
+	go func(filename string, line int, ok bool, args ...interface{}) {
 		prnt(ColorWhite, args...)
 		str := ""
+		if ok {
+			str = fmt.Sprint(filename) + ":" + fmt.Sprint(line)
+		}
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
 		}
@@ -55,7 +60,7 @@ func Log(args ...interface{}) {
 		defer cache.RWMutex.Unlock()
 
 		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")})
-	}(args)
+	}(filename, line, ok, args)
 }
 
 func LogColor(silent bool, color string, args ...interface{}) {
