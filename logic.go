@@ -21,6 +21,8 @@ type logModel struct {
 	Log       string   `json:"log"`
 	Timestamp string   `json:"time"`
 	Tags      []string `json:"tags"`
+	FileName  string   `json:"file_name"`
+	FileLine  int      `json:"file_line"`
 }
 
 type concurrentSlice struct {
@@ -49,8 +51,11 @@ func Log(args ...interface{}) {
 	go func(filename string, line int, ok bool, args ...interface{}) {
 		prnt(ColorWhite, args...)
 		str := ""
+		filenameLog := ""
+		lineLog := 0
 		if ok {
-			str = fmt.Sprint(filename) + ":" + fmt.Sprint(line)
+			filenameLog = filename
+			lineLog = line
 		}
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
@@ -59,7 +64,7 @@ func Log(args ...interface{}) {
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
 
-		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")})
+		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), FileName: filenameLog, FileLine: lineLog})
 	}(filename, line, ok, args)
 }
 
