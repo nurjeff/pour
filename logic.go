@@ -18,17 +18,27 @@ import (
 )
 
 type logModel struct {
-	Log       string   `json:"log"`
-	Timestamp string   `json:"time"`
-	Tags      []string `json:"tags"`
-	FileName  string   `json:"file_name"`
-	FileLine  int      `json:"file_line"`
+	Log       string `json:"log"`
+	Timestamp string `json:"time"`
+	Tag       LogTag `json:"tags"`
+	FileName  string `json:"file_name"`
+	FileLine  int    `json:"file_line"`
 }
 
 type concurrentSlice struct {
 	sync.RWMutex
 	items []logModel
 }
+
+// Do not instantiate this, instead use one of the default Tag types
+// Like: pour.TagSuccess, pour.TagWarning, pour.TagError
+type LogTag struct {
+	ID    uint   `json:"index" bson:"index"`
+	Color string `json:"color" bson:"color"`
+	Name  string `json:"name" bson:"name"`
+}
+
+var tags []LogTag
 
 var cache concurrentSlice = concurrentSlice{}
 var localcache concurrentSlice = concurrentSlice{}
@@ -44,6 +54,16 @@ const MAX_LOG_ERRORS = 2
 
 func SetUseTLS(use bool) {
 	useTLS = use
+}
+
+const TAGSUCCESS = 1
+const TAGWARNING = 2
+const TAGERROR = 3
+
+func fillDefaultTags() {
+	tags = append(tags, LogTag{Color: "#1c9c3e", Name: "Success", ID: 1})
+	tags = append(tags, LogTag{Color: "#c2a525", Name: "Warning", ID: 2})
+	tags = append(tags, LogTag{Color: "#9c1f1f", Name: "Error", ID: 3})
 }
 
 func Log(args ...interface{}) {
@@ -98,8 +118,11 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 	os.Exit(exitCode)
 }
 
-func LogTagged(silent bool, color string, tags []string, args ...interface{}) {
-	go func(tags []string, args ...interface{}) {
+func LogTagged(silent bool, color string, tag uint, args ...interface{}) {
+	go func(tag uint, args ...interface{}) {
+		if tag <= 0 || tag > uint(len(tags)) {
+			tag = 1
+		}
 		if !silent {
 			prnt(color, args...)
 		}
@@ -110,8 +133,8 @@ func LogTagged(silent bool, color string, tags []string, args ...interface{}) {
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
-		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), Tags: tags})
-	}(tags, args)
+		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), Tag: tags[tag-1]})
+	}(tag, args)
 }
 
 func localLog(msg string, time string) {
@@ -159,6 +182,7 @@ var config PourConfig
 // Setups up the logging connection, host and port point to the logging server, key and project build the auth required to communicate with it.
 // The doRemote flag decides whether logs are sent to the remote server or are simply locally logged. isDocker is needed to distinguish between writable file paths.
 func Setup(isDocker bool) {
+	fillDefaultTags()
 	if isDocker {
 		logPath = "./data"
 		if !exists("./data") {
