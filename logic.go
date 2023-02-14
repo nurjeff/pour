@@ -20,7 +20,7 @@ import (
 type logModel struct {
 	Log       string      `json:"log"`
 	Timestamp string      `json:"time"`
-	Tag       ModelLogTag `json:"tags"`
+	Tag       ModelLogTag `json:"tag"`
 	FileName  string      `json:"file_name"`
 	FileLine  int         `json:"file_line"`
 }
