@@ -18,11 +18,11 @@ import (
 )
 
 type logModel struct {
-	Log       string `json:"log"`
-	Timestamp string `json:"time"`
-	Tag       LogTag `json:"tags"`
-	FileName  string `json:"file_name"`
-	FileLine  int    `json:"file_line"`
+	Log       string      `json:"log"`
+	Timestamp string      `json:"time"`
+	Tag       ModelLogTag `json:"tags"`
+	FileName  string      `json:"file_name"`
+	FileLine  int         `json:"file_line"`
 }
 
 type concurrentSlice struct {
@@ -32,13 +32,13 @@ type concurrentSlice struct {
 
 // Do not instantiate this, instead use one of the default Tag types
 // Like: pour.TagSuccess, pour.TagWarning, pour.TagError
-type LogTag struct {
+type ModelLogTag struct {
 	ID    uint   `json:"index" bson:"index"`
 	Color string `json:"color" bson:"color"`
 	Name  string `json:"name" bson:"name"`
 }
 
-var tags []LogTag
+var tags []ModelLogTag
 
 var cache concurrentSlice = concurrentSlice{}
 var localcache concurrentSlice = concurrentSlice{}
@@ -56,19 +56,19 @@ func SetUseTLS(use bool) {
 	useTLS = use
 }
 
-const TAGSUCCESS = 1
-const TAGWARNING = 2
-const TAGERROR = 3
+const TAG_SUCCESS = 1
+const TAG_WARNING = 2
+const TAG_ERROR = 3
 
 func fillDefaultTags() {
-	tags = []LogTag{}
-	tags = append(tags, LogTag{Color: "#1c9c3e", Name: "Success", ID: 1})
-	tags = append(tags, LogTag{Color: "#c2a525", Name: "Warning", ID: 2})
-	tags = append(tags, LogTag{Color: "#9c1f1f", Name: "Error", ID: 3})
+	tags = []ModelLogTag{}
+	tags = append(tags, ModelLogTag{Color: "#1c9c3e", Name: "Success", ID: 1})
+	tags = append(tags, ModelLogTag{Color: "#c2a525", Name: "Warning", ID: 2})
+	tags = append(tags, ModelLogTag{Color: "#9c1f1f", Name: "Error", ID: 3})
 }
 
 // Do not call this ever, this is required for depedency injection for the server
-func SystemDefautTags() []LogTag {
+func SystemDefautTags() []ModelLogTag {
 	fillDefaultTags()
 	return tags
 }
@@ -125,11 +125,24 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 	os.Exit(exitCode)
 }
 
-func LogTagged(silent bool, color string, tag uint, args ...interface{}) {
+func LogTagged(silent bool, tag uint, args ...interface{}) {
 	go func(tag uint, args ...interface{}) {
 		if tag <= 0 || tag > uint(len(tags)) {
 			tag = 1
 		}
+
+		color := ""
+		switch tag {
+		case TAG_ERROR:
+			color = ColorRed
+		case TAG_SUCCESS:
+			color = ColorGreen
+		case TAG_WARNING:
+			color = ColorYellow
+		default:
+			color = ColorWhite
+		}
+
 		if !silent {
 			prnt(color, args...)
 		}
