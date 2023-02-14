@@ -61,9 +61,16 @@ const TAGWARNING = 2
 const TAGERROR = 3
 
 func fillDefaultTags() {
+	tags = []LogTag{}
 	tags = append(tags, LogTag{Color: "#1c9c3e", Name: "Success", ID: 1})
 	tags = append(tags, LogTag{Color: "#c2a525", Name: "Warning", ID: 2})
 	tags = append(tags, LogTag{Color: "#9c1f1f", Name: "Error", ID: 3})
+}
+
+// Do not call this ever, this is required for depedency injection for the server
+func SystemDefautTags() []LogTag {
+	fillDefaultTags()
+	return tags
 }
 
 func Log(args ...interface{}) {
