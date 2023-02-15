@@ -73,6 +73,10 @@ func SystemDefautTags() []ModelLogTag {
 	return tags
 }
 
+func LogErr(err error) {
+	LogTagged(false, TAG_ERROR, err.Error())
+}
+
 func Log(args ...interface{}) {
 	_, filename, line, ok := runtime.Caller(1)
 	go func(filename string, line int, ok bool, args ...interface{}) {
