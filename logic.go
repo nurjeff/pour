@@ -81,7 +81,7 @@ func LogErr(err error) {
 func Log(args ...interface{}) {
 	_, filename, line, ok := runtime.Caller(0)
 	go func(filename string, line int, ok bool, args ...interface{}) {
-		prnt(ColorWhite, args...)
+
 		str := ""
 		filenameLog := ""
 		lineLog := 0
@@ -95,6 +95,7 @@ func Log(args ...interface{}) {
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
 		}
+		prnt(ColorWhite, str)
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
