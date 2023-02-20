@@ -191,7 +191,7 @@ func localLog(msg string, time string) {
 	}
 }
 
-const defaultFileContent = "{\n\t\"remote_logs\": true, \n\t\"project_key\": \"<GET THIS FROM SERVER ADMINISTRATOR>\", \n\t\"host\": \"127.0.0.1\", \n\t\"port\": 12555, \n\t\"client\": \"default_user\", \n\t\"client_key\": \"c8e0e509-ba4b-4c90-bbf2-8336627ac3ed\" \n}"
+const defaultFileContent = "{\n\t\"remote_logs\": true, \n\t\"project_key\": \"<GET THIS FROM SERVER ADMINISTRATOR>\", \n\t\"host\": \"127.0.0.1\", \n\t\"port\": 12555, \n\t\"client\": \"default_user\", \n\t\"client_key\": \"c8e0e509-ba4b-4c90-bbf2-8336627ac3ed\",\n\t\"tls\":true}"
 
 type PourConfig struct {
 	RemoteLogs bool   `json:"remote_logs"`
@@ -200,6 +200,7 @@ type PourConfig struct {
 	Port       int    `json:"port"`
 	Client     string `json:"client"`
 	ClientKey  string `json:"client_key"`
+	TLS        bool   `json:"tls"`
 }
 
 var config PourConfig
@@ -230,6 +231,8 @@ func Setup(isDocker bool) {
 		LogPanicKill(-1, "Pour-Config ("+"./config_pour.json) was created, please fill out and restart the server")
 		return
 	}
+
+	SetUseTLS(config.TLS)
 
 	contents, err := os.ReadFile("./config_pour.json")
 	if err != nil {
