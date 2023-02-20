@@ -161,7 +161,7 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 	cache.RWMutex.Lock()
 	defer cache.RWMutex.Unlock()
 	cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00")})
-	os.Exit(exitCode)
+	panic(str)
 }
 
 func LogTagged(silent bool, tag uint, args ...interface{}) {
