@@ -79,7 +79,7 @@ func LogErr(err error) {
 }
 
 func Log(args ...interface{}) {
-	_, filename, line, ok := runtime.Caller(0)
+	_, filename, line, ok := runtime.Caller(1)
 	go func(filename string, line int, ok bool, args ...interface{}) {
 
 		str := ""
