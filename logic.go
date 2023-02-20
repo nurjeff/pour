@@ -433,8 +433,8 @@ const ColorWhite = "\033[37m"
 const ColorRed = "\033[31m"
 
 func prnt(color string, args ...interface{}) {
-	fmt.Print(time.Now().In(loc).Format(time.RFC822) + " ")
-	text := " "
+	fmt.Print("[" + time.Now().In(loc).Format(time.RFC822) + "] ")
+	text := ""
 	for _, element := range args {
 		text += fmt.Sprint(element)
 		text += " "
