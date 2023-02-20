@@ -486,6 +486,10 @@ const ColorRed = "\033[31m"
 func prnt(color string, text string) {
 	stdOutMutex.Lock()
 	defer stdOutMutex.Unlock()
+	if loc == nil {
+		l, _ := time.LoadLocation("Europe/Berlin")
+		loc = l
+	}
 	fmt.Print("[" + time.Now().In(loc).Format(time.RFC822) + "] ")
 	/*text := ""
 	for _, element := range args {
