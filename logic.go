@@ -80,7 +80,7 @@ func LogErr(err error) {
 
 func Log(args ...interface{}) {
 	_, filename, line, ok := runtime.Caller(1)
-	go func(filename string, line int, ok bool, args ...interface{}) {
+	go func(filename string, line int, ok bool, args []interface{}) {
 
 		str := ""
 		filenameLog := ""
@@ -97,7 +97,6 @@ func Log(args ...interface{}) {
 
 		}
 		for _, element := range args {
-			log.Println("ELEMENT:", element)
 			str += fmt.Sprint(element) + " "
 		}
 		prnt(ColorWhite, str)
@@ -110,7 +109,7 @@ func Log(args ...interface{}) {
 }
 
 func LogColor(silent bool, color string, args ...interface{}) {
-	go func(args ...interface{}) {
+	go func(args []interface{}) {
 		str := ""
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
@@ -146,7 +145,7 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 			_, filename, line, ok = runtime.Caller(2)
 		}
 	}
-	go func(tag uint, filename string, line int, ok bool, args ...interface{}) {
+	go func(tag uint, filename string, line int, ok bool, args []interface{}) {
 		if tag <= 0 || tag > uint(len(tags)) {
 			tag = 1
 		}
