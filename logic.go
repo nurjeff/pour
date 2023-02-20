@@ -88,6 +88,7 @@ func Log(args ...interface{}) {
 		if ok {
 			filenameLog = filename
 			lineLog = line
+			str += filenameLog + ":" + fmt.Sprint(lineLog)
 		}
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
@@ -191,7 +192,7 @@ func localLog(msg string, time string) {
 	}
 }
 
-const defaultFileContent = "{\n\t\"remote_logs\": true, \n\t\"project_key\": \"<GET THIS FROM SERVER ADMINISTRATOR>\", \n\t\"host\": \"127.0.0.1\", \n\t\"port\": 12555, \n\t\"client\": \"default_user\", \n\t\"client_key\": \"c8e0e509-ba4b-4c90-bbf2-8336627ac3ed\",\n\t\"tls\":true\n}"
+const defaultFileContent = "{\n\t\"remote_logs\": true, \n\t\"project_key\": \"<GET THIS FROM SERVER ADMINISTRATOR>\", \n\t\"host\": \"127.0.0.1\", \n\t\"port\": 12555, \n\t\"client\": \"default_user\", \n\t\"client_key\": \"c8e0e509-ba4b-4c90-bbf2-8336627ac3ed\",\n\t\"tls\": true\n}"
 
 type PourConfig struct {
 	RemoteLogs bool   `json:"remote_logs"`
@@ -426,6 +427,6 @@ func prnt(color string, args ...interface{}) {
 		text += " "
 	}
 	fmt.Print(string(color))
-	log.Print(text)
+	fmt.Print(text)
 	fmt.Print(ColorWhite)
 }
