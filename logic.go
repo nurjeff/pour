@@ -95,9 +95,9 @@ func Log(args ...interface{}) {
 			lineLog = line
 			lastFiles := strings.Split(filenameLog, "/")
 			if len(lastFiles) > 0 {
-				str += lastFiles[len(lastFiles)-1] + ":" + fmt.Sprint(lineLog) + " \t"
+				str += lastFiles[len(lastFiles)-1] + ":" + fmt.Sprint(lineLog) + " "
 			} else {
-				str += filenameLog + ":" + fmt.Sprint(lineLog) + " \t"
+				str += filenameLog + ":" + fmt.Sprint(lineLog) + " "
 			}
 
 		}
