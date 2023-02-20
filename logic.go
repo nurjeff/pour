@@ -88,7 +88,13 @@ func Log(args ...interface{}) {
 		if ok {
 			filenameLog = filename
 			lineLog = line
-			str += filenameLog + ":" + fmt.Sprint(lineLog)
+			lastFiles := strings.Split(filenameLog, "/")
+			if len(lastFiles) > 0 {
+				str += lastFiles[len(lastFiles)-1] + ":" + fmt.Sprint(lineLog)
+			} else {
+				str += filenameLog + ":" + fmt.Sprint(lineLog)
+			}
+
 		} else {
 			log.Println("filename not ok")
 		}
