@@ -214,10 +214,16 @@ type PourConfig struct {
 }
 
 var config PourConfig
+var loc *time.Location
 
 // Setups up the logging connection, host and port point to the logging server, key and project build the auth required to communicate with it.
 // The doRemote flag decides whether logs are sent to the remote server or are simply locally logged. isDocker is needed to distinguish between writable file paths.
 func Setup(isDocker bool) {
+	locRes, err := time.LoadLocation("Europe/Germany")
+	if err != nil {
+		LogPanicKill(1, "Could not read location")
+	}
+	loc = locRes
 	fillDefaultTags()
 	if isDocker {
 		logPath = "./data"
@@ -429,7 +435,7 @@ const ColorWhite = "\033[37m"
 const ColorRed = "\033[31m"
 
 func prnt(color string, args ...interface{}) {
-	fmt.Print(time.Now().Format(time.RFC822))
+	fmt.Print(time.Now().In(loc).Format(time.RFC822))
 	text := ""
 	for _, element := range args {
 		text += fmt.Sprint(element)
