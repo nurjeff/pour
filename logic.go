@@ -269,12 +269,12 @@ func Setup(isDocker bool) {
 	if !exists("./config_pour.json") {
 		file, err := os.Create("./config_pour.json")
 		if err != nil {
-			Log(false, ColorRed, "Error auto-creating pour config:", err)
+			LogTagged(false, TAG_ERROR, "Error auto-creating pour config:", err)
 			return
 		}
 		_, err = file.WriteString(defaultFileContent)
 		if err != nil {
-			Log(false, ColorRed, "Error auto-filling pour config:", err)
+			LogTagged(false, TAG_ERROR, "Error auto-filling pour config:", err)
 			return
 		}
 
@@ -295,7 +295,7 @@ func Setup(isDocker bool) {
 	}
 
 	if config.Host == "" || config.Port <= 0 || config.ProjectKey == "" || config.Client == "" || config.ClientKey == "" {
-		Log(false, ColorPurple, "LogServer values invalid, falling back to local")
+		LogTagged(false, TAG_ERROR, "LogServer values invalid, falling back to local")
 	}
 
 	LogColor(false, ColorPurple, "Log-Server configured at", config.Host+":"+fmt.Sprint(config.Port))
@@ -340,7 +340,7 @@ func sendHardwareUsage(hw HardwareUsage) {
 	b, err := json.Marshal(&hw)
 	if err != nil && errorHardwareAmount < MAX_HARDWARE_ERRORS {
 		errorHardwareAmount++
-		Log(false, ColorRed, "Error marshalling hardware-info", err)
+		LogTagged(false, TAG_ERROR, "Error marshalling hardware-info", err)
 		return
 	}
 	httpPrefix := "http://"
@@ -351,7 +351,7 @@ func sendHardwareUsage(hw HardwareUsage) {
 	if err != nil && errorHardwareAmount < MAX_HARDWARE_ERRORS {
 		//Handle Error
 		errorHardwareAmount++
-		Log(false, ColorRed, "Error creating hardware-info request", err)
+		LogTagged(false, TAG_ERROR, "Error creating hardware-info request", err)
 		return
 	}
 
@@ -362,7 +362,7 @@ func sendHardwareUsage(hw HardwareUsage) {
 	res, err := client.Do(req)
 	if err != nil {
 		if errorHardwareAmount < MAX_HARDWARE_ERRORS {
-			Log(false, ColorRed, "Error transmitting hardware-info", err)
+			LogTagged(false, TAG_ERROR, "Error transmitting hardware-info", err)
 			errorHardwareAmount++
 		}
 		return
@@ -370,7 +370,7 @@ func sendHardwareUsage(hw HardwareUsage) {
 
 	if res.StatusCode != http.StatusAccepted && errorHardwareAmount < MAX_HARDWARE_ERRORS {
 		errorHardwareAmount++
-		Log(false, ColorRed, "Error transmitting hardware-info", res)
+		LogTagged(false, TAG_ERROR, "Error transmitting hardware-info", res)
 		return
 	}
 }
@@ -408,7 +408,7 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	b, err := json.Marshal(&logs)
 	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
 		errorLogAmount++
-		Log(false, ColorRed, "Error marshalling logs", err)
+		LogTagged(false, TAG_ERROR, "Error marshalling logs", err)
 		return err
 	}
 	httpPrefix := "http://"
@@ -419,7 +419,7 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
 		//Handle Error
 		errorLogAmount++
-		Log(false, ColorRed, "Error marshalling logs", err)
+		LogTagged(false, TAG_ERROR, "Error marshalling logs", err)
 		return err
 	}
 
@@ -431,7 +431,7 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	if err != nil {
 		if errorLogAmount < MAX_LOG_ERRORS {
 			errorLogAmount++
-			Log(false, ColorRed, "Error transmitting logs", err)
+			LogTagged(false, TAG_ERROR, "Error transmitting logs", err)
 		}
 		return err
 	}
@@ -443,9 +443,9 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 			defer res.Body.Close()
 			read, err := io.ReadAll(res.Body)
 			if err == nil {
-				Log(false, ColorRed, "Error logging", string(read))
+				LogTagged(false, TAG_ERROR, "Error logging", string(read))
 			} else {
-				Log(false, ColorRed, "Error logging", res.StatusCode)
+				LogTagged(false, TAG_ERROR, "Error logging", res.StatusCode)
 			}
 		}
 	}
