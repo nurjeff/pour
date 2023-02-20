@@ -219,7 +219,7 @@ var loc *time.Location
 // Setups up the logging connection, host and port point to the logging server, key and project build the auth required to communicate with it.
 // The doRemote flag decides whether logs are sent to the remote server or are simply locally logged. isDocker is needed to distinguish between writable file paths.
 func Setup(isDocker bool) {
-	locRes, err := time.LoadLocation("Europe/Germany")
+	locRes, err := time.LoadLocation("Europe/Berlin")
 	if err != nil {
 		LogPanicKill(1, "Could not read location")
 	}
