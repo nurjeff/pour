@@ -97,6 +97,7 @@ func Log(args ...interface{}) {
 
 		}
 		for _, element := range args {
+			log.Println("ELEMENT:", element)
 			str += fmt.Sprint(element) + " "
 		}
 		prnt(ColorWhite, str)
