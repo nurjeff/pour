@@ -80,6 +80,9 @@ func LogErr(err error) {
 
 func Log(args ...interface{}) {
 	_, filename, line, ok := runtime.Caller(1)
+	if !ok {
+		_, filename, line, ok = runtime.Caller(0)
+	}
 	go func(filename string, line int, ok bool, args []interface{}) {
 
 		str := ""
@@ -144,6 +147,8 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 		if strings.Contains(filename, "logic.go") {
 			_, filename, line, ok = runtime.Caller(2)
 		}
+	} else {
+		_, filename, line, ok = runtime.Caller(0)
 	}
 	go func(tag uint, filename string, line int, ok bool, args []interface{}) {
 		if tag <= 0 || tag > uint(len(tags)) {
