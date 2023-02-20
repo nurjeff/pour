@@ -141,7 +141,7 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 func LogTagged(silent bool, tag uint, args ...interface{}) {
 	_, filename, line, ok := runtime.Caller(1)
 	if ok {
-		if filename == "logic.go" {
+		if strings.Contains(filename, "logic.go") {
 			_, filename, line, ok = runtime.Caller(2)
 		}
 	}
