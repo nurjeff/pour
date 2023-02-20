@@ -79,7 +79,7 @@ func LogErr(err error) {
 }
 
 func Log(args ...interface{}) {
-	_, filename, line, ok := runtime.Caller(1)
+	_, filename, line, ok := runtime.Caller(2)
 	go func(filename string, line int, ok bool, args ...interface{}) {
 		prnt(ColorWhite, args...)
 		str := ""
@@ -89,6 +89,8 @@ func Log(args ...interface{}) {
 			filenameLog = filename
 			lineLog = line
 			str += filenameLog + ":" + fmt.Sprint(lineLog)
+		} else {
+			log.Println("filename not ok")
 		}
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
@@ -428,5 +430,5 @@ func prnt(color string, args ...interface{}) {
 	}
 	fmt.Print(string(color))
 	fmt.Print(text)
-	fmt.Print(ColorWhite)
+	fmt.Println(ColorWhite)
 }
