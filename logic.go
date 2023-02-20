@@ -139,7 +139,8 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 }
 
 func LogTagged(silent bool, tag uint, args ...interface{}) {
-	go func(tag uint, args ...interface{}) {
+	_, filename, line, ok := runtime.Caller(1)
+	go func(tag uint, filename string, line int, ok bool, args ...interface{}) {
 		if tag <= 0 || tag > uint(len(tags)) {
 			tag = 1
 		}
@@ -156,18 +157,32 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 			color = ColorWhite
 		}
 
-		if !silent {
-			prnt(color, args...)
-		}
 		str := ""
+		filenameLog := ""
+		lineLog := 0
+		if ok {
+			filenameLog = filename
+			lineLog = line
+			lastFiles := strings.Split(filenameLog, "/")
+			if len(lastFiles) > 0 {
+				str += lastFiles[len(lastFiles)-1] + ":" + fmt.Sprint(lineLog) + " "
+			} else {
+				str += filenameLog + ":" + fmt.Sprint(lineLog) + " "
+			}
+
+		}
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
 		}
+		if !silent {
+			prnt(color, str)
+		}
+
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
 		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), Tag: tags[tag-1]})
-	}(tag, args)
+	}(tag, filename, line, ok, args)
 }
 
 func localLog(msg string, time string) {
