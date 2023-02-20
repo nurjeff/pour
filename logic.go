@@ -3,6 +3,7 @@ package pour
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -252,9 +253,12 @@ func Setup(isDocker bool) {
 	runTime = strings.ReplaceAll(runTime, ":", "_")
 
 	LogColor(false, ColorGreen, "Pour up and running..")
+	doRemote = config.RemoteLogs
 	go pollUsage()
-	go logLoop(config.Host, uint(config.Port), config.ProjectKey, config.RemoteLogs, config.Client, config.ClientKey)
+	go logLoop(config.Host, uint(config.Port), config.ProjectKey, config.Client, config.ClientKey)
 }
+
+var doRemote = false
 
 func pollUsage() {
 	for {
@@ -326,7 +330,7 @@ type HardwareUsage struct {
 	CPUInfo     cpu.InfoStat `json:"cpu_info"`
 }
 
-func logLoop(host string, port uint, key string, doRemote bool, client string, clientKey string) {
+func logLoop(host string, port uint, key string, client string, clientKey string) {
 	for {
 		time.Sleep(time.Second * 5)
 		if doRemote && len(cache.items) > 0 {
@@ -340,6 +344,12 @@ var client = http.Client{Transport: &http.Transport{
 }}
 
 func remoteLog(logs []logModel, host string, port uint, key string, logClient string, clientKey string) error {
+	if errorLogAmount > 10 {
+		err := errors.New("unsuccessfully re-tried remote logging 10 times, disabling remote..")
+		LogErr(err)
+		doRemote = false
+		return err
+	}
 	cache.RWMutex.Lock()
 	defer cache.RWMutex.Unlock()
 	b, err := json.Marshal(&logs)
@@ -366,6 +376,7 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 
 	res, err := client.Do(req)
 	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
+		errorLogAmount++
 		Log(false, ColorRed, "Error transmitting logs", err)
 		return err
 	}
