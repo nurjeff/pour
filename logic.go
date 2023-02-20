@@ -412,7 +412,7 @@ var client = http.Client{Transport: &http.Transport{
 }}
 
 func remoteLog(logs []logModel, host string, port uint, key string, logClient string, clientKey string) error {
-	if errorLogAmount > 10 {
+	if errorLogAmount > 100 {
 		err := errors.New("unsuccessfully re-tried remote logging 10 times, disabling remote..")
 		LogErr(err)
 		doRemote = false

@@ -3,6 +3,6 @@
 	"project_key": "<ASK ADMINISTRATOR FOR KEY>", 
 	"host": "127.0.0.1", 
 	"port": 12555, 
-	"client": "loguser2", 
+	"client": "default_user", 
 	"client_key": "b930ffce-d388-43fc-aa1a-13962a7d6bc9" 
 }
