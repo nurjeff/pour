@@ -100,7 +100,9 @@ func Log(args ...interface{}) {
 
 		}
 		for _, element := range args {
-			str += fmt.Sprint(element) + " "
+			if fmt.Sprint(element) != "\n" {
+				str += fmt.Sprint(element) + " "
+			}
 		}
 		prnt(ColorWhite, str)
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
@@ -115,7 +117,9 @@ func LogColor(silent bool, color string, args ...interface{}) {
 	go func(args []interface{}) {
 		str := ""
 		for _, element := range args {
-			str += fmt.Sprint(element) + " "
+			if fmt.Sprint(element) != "\n" {
+				str += fmt.Sprint(element) + " "
+			}
 		}
 		if !silent {
 			prnt(color, str)
@@ -182,7 +186,9 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 
 		}
 		for _, element := range args {
-			str += fmt.Sprint(element) + " "
+			if fmt.Sprint(element) != "\n" {
+				str += fmt.Sprint(element) + " "
+			}
 		}
 		if !silent {
 			prnt(color, str)
