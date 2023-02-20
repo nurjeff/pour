@@ -110,12 +110,12 @@ func Log(args ...interface{}) {
 
 func LogColor(silent bool, color string, args ...interface{}) {
 	go func(args ...interface{}) {
-		if !silent {
-			prnt(color, args...)
-		}
 		str := ""
 		for _, element := range args {
 			str += fmt.Sprint(element) + " "
+		}
+		if !silent {
+			prnt(color, str)
 		}
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
@@ -126,11 +126,11 @@ func LogColor(silent bool, color string, args ...interface{}) {
 }
 
 func LogPanicKill(exitCode int, args ...interface{}) {
-	prnt(ColorRed, args...)
-	str := "PANIC: "
+	str := "PANIC:"
 	for _, element := range args {
 		str += fmt.Sprint(element) + " "
 	}
+	prnt(ColorRed, str)
 	go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 	cache.RWMutex.Lock()
 	defer cache.RWMutex.Unlock()
@@ -452,13 +452,13 @@ const ColorCyan = "\033[36m"
 const ColorWhite = "\033[37m"
 const ColorRed = "\033[31m"
 
-func prnt(color string, args ...interface{}) {
+func prnt(color string, text string) {
 	fmt.Print("[" + time.Now().In(loc).Format(time.RFC822) + "] ")
-	text := ""
+	/*text := ""
 	for _, element := range args {
 		text += fmt.Sprint(element)
 		text += " "
-	}
+	}*/
 	fmt.Print(string(color))
 	fmt.Print(text)
 	fmt.Println(ColorWhite)
