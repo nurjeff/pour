@@ -106,6 +106,7 @@ func Log(args ...interface{}) {
 				str += fmt.Sprint(element) + " "
 			}
 		}
+		str = strings.TrimSpace(str)
 		prnt(ColorWhite, str)
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
@@ -123,6 +124,7 @@ func LogColor(silent bool, color string, args ...interface{}) {
 				str += fmt.Sprint(element) + " "
 			}
 		}
+		str = strings.TrimSpace(str)
 		if !silent {
 			prnt(color, str)
 		}
@@ -192,6 +194,7 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 				str += fmt.Sprint(element) + " "
 			}
 		}
+		str = strings.TrimSpace(str)
 		if !silent {
 			prnt(color, str)
 		}
