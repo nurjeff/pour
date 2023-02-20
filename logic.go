@@ -157,7 +157,7 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 		str += fmt.Sprint(element) + " "
 	}
 	prnt(ColorRed, str)
-	go localLog(str, time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"))
+	localLog(str, time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"))
 	cache.RWMutex.Lock()
 	defer cache.RWMutex.Unlock()
 	cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00")})
