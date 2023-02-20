@@ -422,7 +422,6 @@ func prnt(color string, args ...interface{}) {
 		text += fmt.Sprint(element)
 		text += " "
 	}
-	fmt.Println()
 	fmt.Print(string(color))
 	log.Print(text)
 	fmt.Print(ColorWhite)
