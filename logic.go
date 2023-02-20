@@ -265,16 +265,29 @@ type PourConfig struct {
 var config PourConfig
 var loc *time.Location
 
+func isRunningInDockerContainer() bool {
+	// docker creates a .dockerenv file at the root
+	// of the directory tree inside the container.
+	// if this file exists then the viewer is running
+	// from inside a container so return true
+
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return true
+	}
+
+	return false
+}
+
 // Setups up the logging connection, host and port point to the logging server, key and project build the auth required to communicate with it.
 // The doRemote flag decides whether logs are sent to the remote server or are simply locally logged. isDocker is needed to distinguish between writable file paths.
-func Setup(isDocker bool) {
+func Setup() {
 	locRes, err := time.LoadLocation("Europe/Berlin")
 	if err != nil {
 		LogPanicKill(1, "Could not read location")
 	}
 	loc = locRes
 	fillDefaultTags()
-	if isDocker {
+	if isRunningInDockerContainer() {
 		logPath = "./data"
 		if !exists("./data") {
 			os.Mkdir("./data", 0755)
