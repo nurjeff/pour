@@ -107,11 +107,11 @@ func Log(args ...interface{}) {
 		}
 		str = strings.TrimSpace(str)
 		prnt(ColorWhite, str)
-		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
+		go localLog(str, time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
 
-		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), FileName: filenameLog, FileLine: lineLog})
+		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"), FileName: filenameLog, FileLine: lineLog})
 	}(filename, line, ok, args)
 }
 
@@ -143,11 +143,11 @@ func LogColor(silent bool, color string, args ...interface{}) {
 		if !silent {
 			prnt(color, str)
 		}
-		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
+		go localLog(str, time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
 
-		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")})
+		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00")})
 	}(filename, line, ok, args)
 }
 
@@ -157,10 +157,10 @@ func LogPanicKill(exitCode int, args ...interface{}) {
 		str += fmt.Sprint(element) + " "
 	}
 	prnt(ColorRed, str)
-	go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
+	go localLog(str, time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"))
 	cache.RWMutex.Lock()
 	defer cache.RWMutex.Unlock()
-	cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")})
+	cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00")})
 	os.Exit(exitCode)
 }
 
@@ -214,10 +214,10 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 			prnt(color, str)
 		}
 
-		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
+		go localLog(str, time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
-		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), Tag: tags[tag-1]})
+		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00"), Tag: tags[tag-1]})
 	}(tag, filename, line, ok, args)
 }
 
@@ -315,7 +315,7 @@ func Setup(isDocker bool) {
 
 	LogColor(false, ColorPurple, "Log-Server configured at", config.Host+":"+fmt.Sprint(config.Port))
 
-	runTime = time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")
+	runTime = time.Now().In(loc).UTC().Format("2006-01-02T15:04:05Z07:00")
 	runTime = strings.ReplaceAll(runTime, ":", "_")
 
 	LogColor(false, ColorGreen, "Pour up and running..")
