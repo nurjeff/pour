@@ -99,7 +99,6 @@ func Log(args ...interface{}) {
 			} else {
 				str += filenameLog + ":" + fmt.Sprint(lineLog) + " "
 			}
-
 		}
 		for _, element := range args {
 			if fmt.Sprint(element) != "\n" {
@@ -117,8 +116,24 @@ func Log(args ...interface{}) {
 }
 
 func LogColor(silent bool, color string, args ...interface{}) {
-	go func(args []interface{}) {
+	_, filename, line, ok := runtime.Caller(1)
+	if !ok {
+		_, filename, line, ok = runtime.Caller(0)
+	}
+	go func(filename string, line int, ok bool, args []interface{}) {
 		str := ""
+		filenameLog := ""
+		lineLog := 0
+		if ok {
+			filenameLog = filename
+			lineLog = line
+			lastFiles := strings.Split(filenameLog, "/")
+			if len(lastFiles) > 0 {
+				str += lastFiles[len(lastFiles)-1] + ":" + fmt.Sprint(lineLog) + " "
+			} else {
+				str += filenameLog + ":" + fmt.Sprint(lineLog) + " "
+			}
+		}
 		for _, element := range args {
 			if fmt.Sprint(element) != "\n" {
 				str += fmt.Sprint(element) + " "
@@ -133,7 +148,7 @@ func LogColor(silent bool, color string, args ...interface{}) {
 		defer cache.RWMutex.Unlock()
 
 		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")})
-	}(args)
+	}(filename, line, ok, args)
 }
 
 func LogPanicKill(exitCode int, args ...interface{}) {
