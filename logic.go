@@ -375,7 +375,7 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	req.Header.Add("X-KEY", key)
 
 	res, err := client.Do(req)
-	log.Println(res)
+	log.Println("HERE", res, err)
 	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
 		errorLogAmount++
 		Log(false, ColorRed, "Error transmitting logs", err)
