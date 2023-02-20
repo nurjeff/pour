@@ -297,8 +297,6 @@ func Setup(isDocker bool) {
 		return
 	}
 
-	SetUseTLS(config.TLS)
-
 	contents, err := os.ReadFile("./config_pour.json")
 	if err != nil {
 		LogPanicKill(-1, "Couldn't read pour config")
@@ -308,6 +306,8 @@ func Setup(isDocker bool) {
 		LogPanicKill(-1, "Couldn't read pour config")
 		return
 	}
+
+	SetUseTLS(config.TLS)
 
 	if config.Host == "" || config.Port <= 0 || config.ProjectKey == "" || config.Client == "" || config.ClientKey == "" {
 		LogTagged(false, TAG_ERROR, "LogServer values invalid, falling back to local")
