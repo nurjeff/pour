@@ -309,9 +309,11 @@ func sendHardwareUsage(hw HardwareUsage) {
 	req.Header.Add("X-KEY", config.ProjectKey)
 
 	res, err := client.Do(req)
-	if err != nil && errorHardwareAmount < MAX_HARDWARE_ERRORS {
-		Log(false, ColorRed, "Error transmitting hardware-info", err)
-		errorHardwareAmount++
+	if err != nil {
+		if errorHardwareAmount < MAX_HARDWARE_ERRORS {
+			Log(false, ColorRed, "Error transmitting hardware-info", err)
+			errorHardwareAmount++
+		}
 		return
 	}
 
@@ -375,10 +377,11 @@ func remoteLog(logs []logModel, host string, port uint, key string, logClient st
 	req.Header.Add("X-KEY", key)
 
 	res, err := client.Do(req)
-	log.Println("HERE", res, err)
-	if err != nil && errorLogAmount < MAX_LOG_ERRORS {
-		errorLogAmount++
-		Log(false, ColorRed, "Error transmitting logs", err)
+	if err != nil {
+		if errorLogAmount < MAX_LOG_ERRORS {
+			errorLogAmount++
+			Log(false, ColorRed, "Error transmitting logs", err)
+		}
 		return err
 	}
 	if res.StatusCode == http.StatusAccepted {
