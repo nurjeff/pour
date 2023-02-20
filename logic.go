@@ -158,8 +158,6 @@ func LogTagged(silent bool, tag uint, args ...interface{}) {
 		go localLog(str, time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"))
 		cache.RWMutex.Lock()
 		defer cache.RWMutex.Unlock()
-		log.Println("POURTAG:", tags[tag-1])
-		log.Println("LENGTH:", len(tags))
 		cache.items = append(cache.items, logModel{Log: str, Timestamp: time.Now().UTC().Format("2006-01-02T15:04:05Z07:00"), Tag: tags[tag-1]})
 	}(tag, args)
 }
