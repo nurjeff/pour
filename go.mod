@@ -1,4 +1,4 @@
-module github.com/sc-js/pour
+module github.com/symblCrowd/go-pour
 
 go 1.19
 
