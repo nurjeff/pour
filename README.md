@@ -48,4 +48,5 @@ Available methods:
 Available Tags are:
 
 * TAG_SUCCESS
-* TAG_
+* TAG_WARNING
+* TAG_ERROR
