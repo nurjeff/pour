@@ -1,6 +1,6 @@
-module github.com/symblCrowd/go-pour
+module github.com/sc-js/pour
 
-go 1.19
+go 1.20
 
 require github.com/shirou/gopsutil/v3 v3.23.1
 
