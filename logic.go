@@ -345,7 +345,7 @@ func pollUsage() {
 
 		v, err := mem.VirtualMemory()
 		if err == nil {
-			hw.MemoryFree = v.Free
+			hw.MemoryFree = v.Available
 			hw.MemoryTotal = v.Total
 			hw.MemoryUsed = v.Used
 		}
