@@ -77,7 +77,9 @@ func SystemDefautTags() []ModelLogTag {
 }
 
 func LogErr(err error) {
-	LogTagged(false, TAG_ERROR, err.Error())
+	if err != nil {
+		LogTagged(false, TAG_ERROR, err.Error())
+	}
 }
 
 func Log(args ...interface{}) {
