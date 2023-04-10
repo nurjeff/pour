@@ -1,6 +1,6 @@
 # Logging Package
 
-This package can be used to enhance default logs.
+This package can be used to enhance default logs. Little utility to work with funnel.
 
 ---
 
